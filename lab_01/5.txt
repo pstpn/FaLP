@@ -1,0 +1,15 @@
+1) 
+(defun print1 (ar1 ar2 ar3 ar4) (list (list ar1 ar2) (list ar3 ar4)))
+((lambda (ar1 ar2 ar3 ar4) (list (list ar1 ar2) (list ar3 ar4))) 3 2 4 5)
+
+2)
+(defun print2 (ar1 ar2) (list (list ar1) (list ar2)))
+(defun print2 (ar1 ar2) (cons (cons ar1 Nil) (cons (cons ar2 Nil) Nil)))
+((lambda (ar1 ar2) (list (list ar1) (list ar2))) 3 2)
+((lambda (ar1 ar2) (cons (cons (cons ar1 Nil) (cons ar2 Nil)) Nil) 3 2))
+
+3) 
+(defun print3 (ar1) (list (list (list ar1))))
+(defun print3 (ar1) (cons (cons (cons ar1 Nil) Nil) Nil))
+((lambda (ar1) (list (list (list ar1)))) 2)
+((lambda (ar1) (cons (cons (cons ar1 Nil) Nil) Nil)) 2)
