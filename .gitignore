@@ -15,3 +15,11 @@
 *.sx32fsl
 *.wx64fsl
 *.wx32fsl
+
+*.aux
+*.bcf
+*.log
+*.out
+*.xml
+*.gz
+*.toc

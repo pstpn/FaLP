@@ -1,4 +1,4 @@
 1) RED
 2) NIL
-3) DEF
+3) (DEF)
 4) GHI
