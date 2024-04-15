@@ -1,0 +1,154 @@
+\chapter{Практическая часть}
+
+\section{Задание}
+
+Создать базу знаний <<Собственники>>, дополнив (и минимально изменив) базу знаний, хранящую знания (лаб. 7), знаниями о дополнительной собственности владельца:
+\begin{itemize}
+	\item <<Телефонный справочник>>: Фамилия, №тел, Адрес~--- структура (Город, Улица, №дома, №кв),
+	\item <<Автомобили>>: Фамилия\_владельца, Марка, Цвет, Стоимость и др.,
+	\item <<Вкладчики банков>>: Фамилия, Банк, Счет, Сумма и др.
+\end{itemize}
+
+Преобразовать знания об автомобиле к форме знаний о собственности.
+Вид собственности (кроме автомобиля):
+\begin{itemize}
+	\item Строение: стоимость и другие его характеристики;
+	\item Участок: стоимость и другие его характеристики;
+	\item Водный\_транспорт: стоимость и другие его характеристики.
+\end{itemize}
+
+Описать и использовать вариантный домен \textbf{Собственность}.
+Владелец может иметь, но только один объект каждого вида собственности (это касается и автомобиля), или не иметь некоторых видов собственности.
+Используя конъюнктивное правило и разные формы задания одного вопроса (пояснять, для какого задания~--- какой вопрос), обеспечить возможность поиска:
+\begin{enumerate}
+	\item названий всех объектов собственности заданного субъекта,
+	\item названий и стоимости всех объектов собственности заданного субъекта,
+	\item разработать правило, позволяющее найти суммарную стоимость всех объектов собственности заданного субъекта.
+\end{enumerate}
+
+Для 2-го пункта и одной фамилии составить таблицу, отражающую конкретный порядок работы системы, с объяснениями порядка работы и особенностей использования доменов (указать конкретные T1 и T2 и полную подстановку на каждом шаге).
+
+В листинге \ref{lst:lab_02.pro} представлен исходный код реализованной программы.
+\includelistingpretty
+	{lab_02.pro}
+	{prolog}
+	{Исходный код программы}
+
+\section{Порядок работы системы}
+
+Вопрос: \texttt{subject\_property\_price(''Ivanov'', Type, Price).}
+
+	\footnotesize
+	\begin{xltabular}{\textwidth}{|l|X|Y|}
+		\hline
+		\textbf{№ шага} &
+		\textbf{Сравниваемые термы: результат; подстановка, если есть} &
+		\textbf{Дальнейшие действия: прямой ход или откат} \\ \hline
+
+		1 & 
+		Сравнение:\newline
+		\texttt{subject\_property\_price(''Ivanov'', Type, Price) == phonebook(''Ivanov'', ''412314'', address\_struct(''Moscow'', ''Lenina'', 3, 3))} \newline\newline
+		Унификация: неудача &
+		Прямой ход, переход к следующему предложению \\ \hline
+
+		2 -- 31 & \centering \dots & \dots \\ \hline
+
+		32 &
+		Сравнение:\newline
+		\texttt{subject\_property\_price(''Ivanov'', Type, Price) == subject\_property\_price(Surname, region, Price)} \newline\newline
+		Унификация: успех \newline\newline
+		Подстановка:\newline
+		\texttt{\{Surname = ''Ivanov'', Type = region, Price = Price\}} & 
+		Переход к телу правила. \newline\newline
+		Унификация\newline
+		\texttt{owner(''Ivanov'', region(Price, \_))} \\ \hline
+
+		33 &
+		Сравнение:\newline
+		\texttt{owner(''Ivanov'', region(Price, \_)) == phonebook(''Ivanov'', ''412314'', address\_struct(''Moscow'', ''Lenina'', 3, 3))} \newline\newline
+		Унификация: неудача &
+		Прямой ход, переход к следующему предложению \\ \hline
+
+		34 -- 58 & \centering \dots & \dots \\ \hline
+
+		59 &
+		Сравнение:\newline
+		\texttt{owner(''Ivanov'', region(Price, \_) == owner(''Ivanov'', region(4325325, 22)} \newline\newline
+		Унификация: успех \newline\newline
+		Подстановка: \texttt{\{Price = 4325325\}} & 
+		Решение найдено, в качестве побочного эффекта получена подстановка \texttt{\{Property = region, Price = 4325325\}} \newline\newline 
+		Откат с целью найти все возможные решения.
+		Реконкретизация переменной Price.
+		Переход к следующему предложению.\\ \hline
+
+		60 &
+		Сравнение:\newline
+		\texttt{owner(''Ivanov'', region(Price, \_) == owner(''Ivanova'', region(Price, \_)} \newline\newline
+		Унификация: неудача &
+		Прямой ход, переход к следующему предложению. \\ \hline
+
+		61 -- 66 & \centering \dots & \dots \\ \hline
+
+		67 &
+		 &
+		Конец базы знаний~--- откат.
+		Реконкретизация переменных Surname, Property.
+		Переход к следующему предложению относительно шага 32.\\ \hline
+
+		68 &
+		Сравнение:\newline
+		\texttt{subject\_property\_price(''Ivanov'', Type, Price) == subject\_property\_price(Surname, building, Price)} \newline\newline
+		Унификация: успех \newline\newline
+		Подстановка:\newline
+		\texttt{\{Surname = ''Ivanov'', Type = building, Price = Price\}} & 
+		Переход к телу правила. \newline\newline
+		Унификация\newline
+		\texttt{owner(''Ivanov'', building(Price, \_,))} \\ \hline
+		
+		69 &
+		Сравнение:\newline
+		\texttt{owner(''Ivanov'', building(Price, \_,)) == phonebook(''Ivanov'', ''412314'', address\_struct(''Moscow'', ''Lenina'', 3, 3))} \newline\newline
+		Унификация: неудача &
+		Прямой ход, переход к следующему предложению \\ \hline
+
+		70 -- 91 & \centering \dots & \dots \\ \hline
+
+		92 &
+		Сравнение:\newline
+		\texttt{owner(''Ivanov'', building(Price, \_,)) == owner(''Ivanov'', building(4214124, address\_struct(''Tver'', ''Lenina'', 1, 1))).} \newline\newline
+		Унификация: успех \newline\newline
+		Подстановка: \texttt{\{Price = 4214124\}} & 
+		Решение найдено, в качестве побочного эффекта получена подстановка \texttt{\{Property = building, Price = 4214124\}} \newline\newline 
+		Откат с целью найти все возможные решения.
+		Реконкретизация переменной Price.
+		Переход к следующему предложению.\\ \hline
+
+		93 &
+		Сравнение:\newline
+		\texttt{owner(''Ivanov'', building(Price, \_,)) == owner("Petrov", building(235214, address\_struct("Moscow", "Azimova", 12, 13)))} \newline\newline
+		Унификация: неудача &
+		Прямой ход, переход к следующему предложению \\ \hline
+
+		94 -- 101 & \centering \dots & \dots \\ \hline
+
+		102 &
+		 &
+		Конец базы знаний~--- откат.
+		Реконкретизация переменных Surname, Property.
+		Переход к следующему предложению относительно шага 32.\\ \hline
+
+		103 &
+		Сравнение:\newline
+		\texttt{subject\_property\_price(''Ivanov'', Type, Price) == property\_cost(Surname, car, Cost)} \newline\newline
+		Унификация: неудача &
+		Прямой ход, переход к следующему предложению \\ \hline
+
+		104 -- 109 & \centering \dots & \dots \\ \hline
+
+		110 &
+		&
+		Конец базы знаний.
+		Завершение работы. \newline\newline
+		На вопрос удалось получить ответ <<да>>, поэтому в качестве побочного эффекта возвращено 2 подстановки.
+		\\ \hline
+	\end{xltabular}

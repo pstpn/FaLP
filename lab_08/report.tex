@@ -1,0 +1,17 @@
+\documentclass{bmstu}
+
+\usepackage{xltabular}
+
+\setlist[enumerate]{label=\arabic*)}
+\setlist[itemize]{label=---}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+\newenvironment{nscenter}
+{\parskip=0pt\par\nopagebreak\centering}
+{\par\noindent\ignorespacesafterend}
+
+\begin{document}
+	\include{01-title}
+	\maketableofcontents
+	\include{02-practice}
+\end{document}
